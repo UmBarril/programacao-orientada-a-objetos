@@ -87,4 +87,8 @@ public class SistemaAmigo
             amigo.setEmailAmigoSorteado(amigoSorteado.getEmail());
         }
     }
+    // Extra
+    public List<Amigo> getAmigos() {
+        return this.amigos;
+    }
 }

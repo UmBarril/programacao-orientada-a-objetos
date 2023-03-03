@@ -15,6 +15,7 @@ class MensagemParaAlguem extends Mensagem {
         this.emailDestinatario = emailDestinatario;
     }
 
+    @Override
     public String getTextoCompletoAExibir() {
         if(this.ehAnonima()) {
             return String.format("Mensagem para %s. Texto:  %s", this.getEmailDestinatario(), this.getTexto());
