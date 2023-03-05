@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 public class TestaSistemaAmigo {
     public static void main(String[] args) {
         SistemaAmigo sistema = new SistemaAmigo();

@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 class Amigo {
     private String nome;
     private String email;

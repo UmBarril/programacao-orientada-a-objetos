@@ -1,5 +1,7 @@
+package SistemaAmigo;
+
 public class AmigoInexistenteException extends Exception {
     public AmigoInexistenteException() {
-        super("Amigo não encontrado!");
+        super("SistemaAmigo.Amigo não encontrado!");
     }
 }

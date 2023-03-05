@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 import javax.swing.*;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class TestaSistemaAmigoGUI {
 
         // enviar mensagem
         Amigo amigoAleatorio = amigos.get((int)(Math.random() * amigos.size()));
-        String texto = JOptionPane.showInputDialog(String.format("Mensagem de %s para TODOS. Digite o texto a ser enviado:", amigoAleatorio.getNome()));
+        String texto = JOptionPane.showInputDialog(String.format("SistemaAmigo.Mensagem de %s para TODOS. Digite o texto a ser enviado:", amigoAleatorio.getNome()));
         int result = JOptionPane.showConfirmDialog(null, "Deseja enviar esta mensagem de maneira Anônima?", "Pergunta.", JOptionPane.YES_NO_OPTION);
         sistema.enviarMensagemParaTodos(texto, amigoAleatorio.getEmail(), result == 0);
         List<Mensagem> msgs = sistema.pesquisaTodasAsMensagens();

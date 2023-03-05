@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class SistemaAmigo
 
     // Método que configura o amigo secreto sorteado para a pessoa cujo e-mail é “emailDaPessoa”, atribuindo-lhe seu
     // amigo secreto como sendo a pessoa de e-mail “emailAmigoSecreto”. Caso não exista pessoa cadastrada no sistema
-    // com o e-mail “emailDaPessoa, deve ser lançada a exceção “AmigoInexistenteException”.
+    // com o e-mail “emailDaPessoa, deve ser lançada a exceção “SistemaAmigo.AmigoInexistenteException”.
     public void configuraAmigoSecretoDe(String emailDaPessoa, String emailAmigoSorteado) throws AmigoInexistenteException {
         Amigo pessoa = this.pesquisaAmigo(emailDaPessoa);
         if(pessoa == null) {
@@ -62,9 +64,9 @@ public class SistemaAmigo
 
     // Método que pesquisa o e-mail do amigo secreto sorteado para a pessoa cujo e-mail é “emailDaPessoa”
     // Caso não exista pessoa cadastrada no sistema com o e-mail “emailDaPessoa”, deve ser lançada a exceção
-    // “AmigoInexistenteException”. Caso exista a pessoa com esse e-mail, mas o seu amigo secreto sorteado
+    // “SistemaAmigo.AmigoInexistenteException”. Caso exista a pessoa com esse e-mail, mas o seu amigo secreto sorteado
     // ainda não tenha sido configurado (o e-mail do amigo sorteado é null), deve ser lançada a exceção
-    // “AmigoNaoSorteadoException”.
+    // “SistemaAmigo.AmigoNaoSorteadoException”.
     public String pesquisaAmigoSecretoDe(String emailDaPessoa) throws AmigoInexistenteException, AmigoNaoSorteadoException {
         Amigo pessoa = this.pesquisaAmigo(emailDaPessoa);
         if(pessoa == null) {

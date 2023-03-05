@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 class MensagemParaAlguem extends Mensagem {
     private String emailDestinatario;
 
@@ -18,8 +20,8 @@ class MensagemParaAlguem extends Mensagem {
     @Override
     public String getTextoCompletoAExibir() {
         if(this.ehAnonima()) {
-            return String.format("Mensagem para %s. Texto:  %s", this.getEmailDestinatario(), this.getTexto());
+            return String.format("SistemaAmigo.Mensagem para %s. Texto:  %s", this.getEmailDestinatario(), this.getTexto());
         }
-        return String.format("Mensagem de: %s para %s. Texto: %s", this.getEmailRementente(), this.getEmailDestinatario(), this.getTexto());
+        return String.format("SistemaAmigo.Mensagem de: %s para %s. Texto: %s", this.getEmailRementente(), this.getEmailDestinatario(), this.getTexto());
     }
 }

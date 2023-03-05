@@ -1,3 +1,5 @@
+package SistemaAmigo;
+
 abstract class Mensagem {
     private String texto;
     private String emailRementente;
