@@ -25,6 +25,6 @@ public class Turma {
                 .stream()
                 .filter(aluno -> aluno.getCpf().equals(cpfDoAluno))
                 .findFirst()
-                .orElseThrow();
+                .orElse(null);
     }
 }
