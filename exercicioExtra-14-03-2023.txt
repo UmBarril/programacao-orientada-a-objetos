@@ -1,0 +1,29 @@
+1) *no papel*
+2)
+public boolean cadastraCandidato(String nome, int numero, Partido partido) {
+	if(this.candidatos.containsKey(nome)) {
+		return false;
+	}
+	this.candidatos.put(nome, new Candidato(nome, numero, partido);
+	return true;
+}
+public int contarVotosParaCandidato(int numero) {
+	int votosParaCandidato = 0;
+	for(Voto voto : this.votos()) {
+		if(this.getNumeroVotado() == numero) {
+			votosParaCandidato++;
+		}
+	}	
+	return votosParaCandidato;
+}
+
+
+3) é lançado quando o método não consegue encontrar o candidato com o nome inserido no Map de Candidatos do sistema
+4) 
+@Test
+public void testaCadastro() {
+	SistemaEleitoralMap sistema = new SistemaEleitoralMap();
+
+	Assertions.assertTrue(sistema.cadastraEleitor("Foo", 1, Partido.PARTIDO1));
+	Assertions.assertFalse(sistema.cadastraEleitor("Foo", 1, Partido.PARTIDO1));
+}
