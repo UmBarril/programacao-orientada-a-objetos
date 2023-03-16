@@ -84,6 +84,7 @@ public class SistemaAmigoMap
 
     // Opcional
     public void sortear() {
+
         List<Amigo> amigosNaoSorteados = new ArrayList<>();
         amigosNaoSorteados.addAll(this.amigosMap.values());
         for (Amigo amigo : this.amigosMap.values()) {
