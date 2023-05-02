@@ -3,6 +3,11 @@ package org.barril;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -99,5 +104,12 @@ public class Tocador {
     }
     public String getMusicaAtual() {
         return musicas.peek().getSource();
+    }
+
+    public static void salvarMusica(String enderecoEletronico, String caminho) throws IOException {
+        URL url = new URL(enderecoEletronico);
+        ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+        FileOutputStream fo = new FileOutputStream(caminho);
+        fo.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
     }
 }
