@@ -13,7 +13,7 @@ public class GUI {
     private JFrame janela;
     public Tocador tocador;
     private JLabel imagemSuperiorEsquerda = new JLabel();
-    private JButton botaoInferiorEsquerdo = new JButton();
+    private JButton botaoPlay = new JButton();
     public GUI() {
         tocador = new Tocador();
 
@@ -44,9 +44,8 @@ public class GUI {
 
         JPanel direita = new JPanel();
         direita.setLayout(new GridLayout(2,1));
-        criarBotaoPlayEImagem();
         direita.add(imagemSuperiorEsquerda);
-        direita.add(botaoInferiorEsquerdo);
+        direita.add(criarPainelInferiorDireito());
 
         janela.add(esquerda);
         janela.add(direita);
@@ -68,21 +67,21 @@ public class GUI {
             if(imagemSuperiorEsquerda.getName() == null || !imagemSuperiorEsquerda.getName().equals(caminho)) {
                 mudarImagem(caminho);
             }
-            botaoInferiorEsquerdo.setText("Pausar musica");
+            botaoPlay.setText("Pausar musica");
         } else {
             String caminho = "src/main/resources/not_music.jpg";
             if(imagemSuperiorEsquerda.getName() == null || !imagemSuperiorEsquerda.getName().equals(caminho)) {
                 mudarImagem(caminho);
             }
             if(tocador.getStatusAtual() == MediaPlayer.Status.STALLED) {
-                botaoInferiorEsquerdo.setText("<html>Não há mais músicas na fila.<br> Adicione!<html>");
+                botaoPlay.setText("<html>Não há mais músicas na fila.<br> Adicione!<html>");
             } else {
-                botaoInferiorEsquerdo.setText("Tocar música");
+                botaoPlay.setText("Tocar música");
             }
         }
     }
-    public JPanel criarBotaoPlayEImagem() {
-        botaoInferiorEsquerdo.addActionListener(e -> {
+    public JPanel criarPainelInferiorDireito() {
+        botaoPlay.addActionListener(e -> {
             if(tocador.getStatusAtual() == MediaPlayer.Status.STALLED){
                 JOptionPane.showMessageDialog(null, "Você precisa adicionar músicas na fila primeiro!");
                 return;
@@ -99,13 +98,28 @@ public class GUI {
             }
             atualizarImagemETexto();
         });
-        botaoInferiorEsquerdo.setBackground(Color.DARK_GRAY);
-        botaoInferiorEsquerdo.setForeground(Color.WHITE);
+        botaoPlay.setBackground(Color.DARK_GRAY);
+        botaoPlay.setForeground(Color.WHITE);
         atualizarImagemETexto();
 
+        JButton botaoSalvar = new JButton("Salvar musica");
+        botaoSalvar.addActionListener(e -> {
+            try {
+                SalvaMusica.salvar(
+                        JOptionPane.showInputDialog(null, "Escreva a URL da música."),
+                        JOptionPane.showInputDialog(null, "Escreva o caminho completo para salvar a música (incluido o nome e a extensão do arquivo a ser salvo)")
+                );
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        botaoSalvar.setBackground(Color.DARK_GRAY);
+        botaoSalvar.setForeground(Color.WHITE);
+
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1,1));
-        panel.add(botaoInferiorEsquerdo);
+        panel.setLayout(new GridLayout(1,2));
+        panel.add(botaoPlay);
+        panel.add(botaoSalvar);
         return panel;
     }
     public JPanel criarPainelSuperior() {

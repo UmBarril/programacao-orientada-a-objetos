@@ -7,3 +7,4 @@ Tocador de MOOOOSICAS.
   - Aumentar e diminuir som
   - Fazer uma mini playlist
   - Tocar sons da internet por meio de links
+  - Pode salvar músicas em um arquivo

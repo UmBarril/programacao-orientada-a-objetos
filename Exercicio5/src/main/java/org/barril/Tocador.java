@@ -94,4 +94,10 @@ public class Tocador {
             atual.setMute(mute);
         }
     }
+    public boolean estaMutado() {
+        return mute;
+    }
+    public String getMusicaAtual() {
+        return musicas.peek().getSource();
+    }
 }
