@@ -25,10 +25,14 @@ public class GUI {
         janela = new JFrame();
         janela.setTitle("TOCADOR DE MOOOOSICAS");
 
-        BufferedImage img = ImageIO.read(new File(""));
-        ImageIcon icon = new ImageIcon(img);
-
-        janela.setIconImage(icon.getImage());
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("src/main/resources/doge.png"));
+            ImageIcon icon = new ImageIcon(img);
+            janela.setIconImage(icon.getImage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         janela.setLayout(new GridLayout(1, 2));
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         janela.setSize(500,500);
@@ -52,18 +56,29 @@ public class GUI {
             BufferedImage img = ImageIO.read(new File(caminho));
             ImageIcon ico = new ImageIcon(img.getScaledInstance(250, 250, Image.SCALE_SMOOTH));
             imagemSuperiorEsquerda.setIcon(ico);
+            imagemSuperiorEsquerda.setName(caminho);
         } catch (IOException exp) {
             imagemSuperiorEsquerda.setText("se vc esta vendo isso, deu ruim na imagem.");
             System.out.println("erro: " + exp);
         }
     }
     public void atualizarImagemETexto() {
-        if(tocador.getStatusAtual() != MediaPlayer.Status.PLAYING){
-            mudarImagem("src/main/resources/ovino_moosica.jpg");
+        if(tocador.getStatusAtual() == MediaPlayer.Status.PLAYING){
+            String caminho = "src/main/resources/ovino_moosica.jpg";
+            if(imagemSuperiorEsquerda.getName() == null || !imagemSuperiorEsquerda.getName().equals(caminho)) {
+                mudarImagem(caminho);
+            }
             botaoInferiorEsquerdo.setText("Pausar musica");
         } else {
-            mudarImagem("src/main/resources/not_music.jpg");
-            botaoInferiorEsquerdo.setText("Tocar música");
+            String caminho = "src/main/resources/not_music.jpg";
+            if(imagemSuperiorEsquerda.getName() == null || !imagemSuperiorEsquerda.getName().equals(caminho)) {
+                mudarImagem(caminho);
+            }
+            if(tocador.getStatusAtual() == MediaPlayer.Status.STALLED) {
+                botaoInferiorEsquerdo.setText("<html>Não há mais músicas na fila.<br> Adicione!<html>");
+            } else {
+                botaoInferiorEsquerdo.setText("Tocar música");
+            }
         }
     }
     public JPanel criarBotaoPlayEImagem() {
@@ -76,8 +91,10 @@ public class GUI {
                     JOptionPane.showMessageDialog(null, "Não há mais músicas na fila.");
                 }
             } else {
-                if(!tocador.proximaMusica()) {
-                    JOptionPane.showMessageDialog(null, "Não há mais músicas na fila.");
+                try {
+                    tocador.pausarMusica();
+                } catch (NenhumaMusicaNaFilaException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
             atualizarImagemETexto();
@@ -96,6 +113,7 @@ public class GUI {
         addbtn.addActionListener(e -> {
             String linkDaMusica = JOptionPane.showInputDialog("link da moosica");
             tocador.adicionarMusica(linkDaMusica);
+            atualizarImagemETexto();
         });
         addbtn.setBackground(Color.DARK_GRAY);
         addbtn.setForeground(Color.WHITE);
@@ -103,9 +121,8 @@ public class GUI {
         JButton rmbtn = new JButton("Pular música");
         rmbtn.addActionListener(e -> {
             if(!tocador.proximaMusica()) {
-                mudarImagem("src/main/resources/not_music.jpg");
-                botaoInferiorEsquerdo.setText("Tocar música");
                 JOptionPane.showMessageDialog(null, "Não há mais músicas na fila.");
+                atualizarImagemETexto();
             }
         });
         rmbtn.setBackground(Color.DARK_GRAY);

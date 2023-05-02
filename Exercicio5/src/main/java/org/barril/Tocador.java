@@ -49,25 +49,34 @@ public class Tocador {
             return false;
         } else if(atual.getMedia() != null) {
             atual.dispose();
+            atual = null;
         }
         Media proximo = musicas.poll();
+        if(proximo == null) {
+            return false;
+        }
         atual = new MediaPlayer(proximo);
-        return proximo != null;
+        return true;
     }
     public MediaPlayer.Status getStatusAtual() {
         if(atual == null) {
             return MediaPlayer.Status.STALLED;
         }
         return atual.getStatus();
+//        return MediaPlayer.Status.PLAYING;
     }
     public boolean temMusica() {
         return !musicas.isEmpty();
     }
     public String getFilaComoString() {
         StringBuilder sb = new StringBuilder();
+        int i = 0;
+        sb.append("<html>");
         for(Media m : musicas) {
-            sb.append(m.getMetadata() + "\b");
+            sb.append(i + ": " + m.getSource() + "<br>");
+            i++;
         }
+        sb.append("</html>");
         return sb.toString();
     }
     public void setVolume(double volume) {
