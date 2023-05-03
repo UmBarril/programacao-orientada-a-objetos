@@ -11,21 +11,29 @@ import java.io.IOException;
 import java.net.URL;
 
 public class GUI {
-    private JFrame janela;
-    public Tocador tocador;
-    private JLabel imagemLbl = new JLabel();
-    private JButton botaoPlay = new JButton();
+    private final JFrame janela = new JFrame();
+    private final Tocador tocador = new Tocador();
+    private final JLabel imagemLbl = new JLabel();
+    private final JButton botaoPlay = new JButton();
+    private final JButton botaoSalvar = new JButton("<html>Salvar musica<br> a partir de uma URL</html>");
+    private final JButton pularBtn = new JButton("Pular música");
+    private final JButton mostraFilaBtn = new JButton("Mostrar fila");
+    private final JButton volumeMaisBtn = new JButton("Vol +");
+    private final JButton muteBtn = new JButton("Mutar");
+    private final JButton volumeMenosBtn = new JButton("Vol -");
+    private final JButton adicionarMusicaLocalBtn = new JButton("<html><center><b>Adicionar música localmente</b><br>");
+    private final JButton adicionarMusicaURLBtn = new JButton("<html><center><b>Adicionar música da internet</b><br>");
+    private final JButton carregarPlaylistBtn = new JButton("<html><center><b>Carregar playlist</b><br>");
+    public URL getResource(String nome) {
+        return getClass().getClassLoader().getResource(nome);
+    }
     public GUI() {
-        tocador = new Tocador();
-
         tocador.setAoFimDaMusica(() -> {
             tocador.proximaMusica();
             if(!tocador.tocarMusica()) {
-                atualizarImagemETexto(false);
-            };
+                atualizarImagemETexto(MediaPlayer.Status.STALLED);
+            }
         });
-
-        janela = new JFrame();
         janela.setTitle("TOCADOR DE MOOOOSICAS");
 
         janela.setIconImage(new ImageIcon(getResource("doge.png")).getImage());
@@ -46,17 +54,14 @@ public class GUI {
         janela.add(esquerda);
         janela.add(direita);
     }
-    public URL getResource(String nome) {
-        return getClass().getClassLoader().getResource(nome);
-    }
-    public void atualizarImagemETexto(boolean tocando) {
-        if(tocando) {
+    public void atualizarImagemETexto(MediaPlayer.Status status) {
+        if(status == MediaPlayer.Status.PLAYING) {
             imagemLbl.setIcon(new ImageIcon(getResource("rsz_ovino_moosica.jpg")));
             imagemLbl.setIcon(new ImageIcon(getResource("rsz-da-rock.gif")));
             botaoPlay.setText("Pausar musica");
         } else {
             imagemLbl.setIcon(new ImageIcon(getResource("rsz_not_music.jpg")));
-            if(tocador.getStatusAtual() == MediaPlayer.Status.STALLED) {
+            if(status == MediaPlayer.Status.STALLED) {
                 botaoPlay.setText("<html>Não há mais músicas na fila.<br> Adicione!<html>");
             } else {
                 botaoPlay.setText("Tocar música");
@@ -65,37 +70,37 @@ public class GUI {
     }
     public JPanel criarPainelInferiorDireito() {
         botaoPlay.addActionListener(e -> {
-            if(tocador.getStatusAtual() == MediaPlayer.Status.STALLED){
+            if(tocador.getStatus() == MediaPlayer.Status.STALLED) {
                 JOptionPane.showMessageDialog(janela, "Você precisa adicionar músicas na fila primeiro!");
-            } else if(tocador.getStatusAtual() != MediaPlayer.Status.PLAYING){
-                if(!tocador.tocarMusica()) {
+            } else if(tocador.getStatus() != MediaPlayer.Status.PLAYING) {
+                if (!tocador.tocarMusica()) {
                     JOptionPane.showMessageDialog(janela, "Não há mais músicas na fila.");
+                    return;
                 }
-                atualizarImagemETexto(true);
+                atualizarImagemETexto(MediaPlayer.Status.PLAYING);
             } else {
                 try {
                     tocador.pausarMusica();
                 } catch (NenhumaMusicaNaFilaException ex) {
                     throw new RuntimeException(ex);
                 }
-                atualizarImagemETexto(false);
+                atualizarImagemETexto(MediaPlayer.Status.PAUSED);
             }
         });
         botaoPlay.setBackground(Color.DARK_GRAY);
         botaoPlay.setForeground(Color.WHITE);
-        atualizarImagemETexto(false);
+        atualizarImagemETexto(MediaPlayer.Status.STALLED);
 
-        JButton botaoSalvar = new JButton("<html>Salvar musica<br> a partir de uma URL</html>");
         botaoSalvar.addActionListener(e -> {
             try {
                 String url = JOptionPane.showInputDialog(janela, "Escreva a URL da música.");
-                if(url == null) return;
+                if (url == null) return;
 
                 JFileChooser fc = new JFileChooser();
                 fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fc.setDialogTitle("Especifique a pasta onde salvar a música");
 
-                if(JFileChooser.APPROVE_OPTION == fc.showSaveDialog(janela)) {
+                if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(janela)) {
                     Tocador.salvarMusica(url.trim(), fc.getSelectedFile().toPath());
                 }
             } catch (IOException ex) {
@@ -105,11 +110,10 @@ public class GUI {
         botaoSalvar.setBackground(Color.DARK_GRAY);
         botaoSalvar.setForeground(Color.WHITE);
 
-        JButton pularBtn = new JButton("Pular música");
         pularBtn.addActionListener(e -> {
             if(!tocador.proximaMusica()) {
                 JOptionPane.showMessageDialog(janela, "Não há mais músicas na fila.");
-                atualizarImagemETexto(false);
+                atualizarImagemETexto(MediaPlayer.Status.STALLED);
             }
         });
         JPanel meio = new JPanel();
@@ -126,8 +130,7 @@ public class GUI {
         return panel;
     }
     public JPanel criarPainelSuperior() {
-        JButton addbtn = new JButton("<html><center><b>Adicionar música da internet</b><br>");
-        addbtn.addActionListener(e -> {
+        adicionarMusicaURLBtn.addActionListener(e -> {
             String linkDaMusica = JOptionPane.showInputDialog("Link da moosica");
             if(linkDaMusica == null) return;
             try {
@@ -135,13 +138,12 @@ public class GUI {
             } catch (MediaException ex) {
                 JOptionPane.showMessageDialog(janela, "Não foi possível encontrar a música. Erro: " + ex.getMessage());
             }
-            atualizarImagemETexto(false);
+            atualizarImagemETexto(tocador.getStatus());
         });
-        addbtn.setBackground(Color.DARK_GRAY);
-        addbtn.setForeground(Color.WHITE);
+        adicionarMusicaURLBtn.setBackground(Color.DARK_GRAY);
+        adicionarMusicaURLBtn.setForeground(Color.WHITE);
 
-        JButton addCaminhoBtn = new JButton("<html><center><b>Adicionar música localmente</b><br>");
-        addCaminhoBtn .addActionListener(e -> {
+        adicionarMusicaLocalBtn.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             // tipos suportados pelo JavaFX https://docs.oracle.com/javafx/2/api/javafx/scene/media/package-summary.html#SupportedMediaTypes
             fc.setFileFilter(new FileNameExtensionFilter("Arquivo de música (*.mp3, *.aac, *.wav)", "mp3", "aac", "wav"));
@@ -149,14 +151,14 @@ public class GUI {
                 String caminho = fc.getSelectedFile().toURI().toString();
                 try {
                     tocador.adicionarMusica(caminho);
-                    atualizarImagemETexto(false);
+                    atualizarImagemETexto(tocador.getStatus());
                 } catch (MediaException ex) {
-                    JOptionPane.showMessageDialog(addbtn, "Não foi possível encontrar a música. Erro: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(adicionarMusicaURLBtn, "Não foi possível encontrar a música. Erro: " + ex.getMessage());
                 }
             }
         });
-        addCaminhoBtn.setBackground(Color.DARK_GRAY);
-        addCaminhoBtn.setForeground(Color.WHITE);
+        adicionarMusicaLocalBtn.setBackground(Color.DARK_GRAY);
+        adicionarMusicaLocalBtn.setForeground(Color.WHITE);
 
         JButton salvarPlaylistBtn = new JButton("<html><center><b>Salvar playlist atual</b><br>");
         salvarPlaylistBtn.addActionListener(e -> {
@@ -174,14 +176,13 @@ public class GUI {
         salvarPlaylistBtn.setBackground(Color.DARK_GRAY);
         salvarPlaylistBtn.setForeground(Color.WHITE);
         
-        JButton carregarPlaylistBtn = new JButton("<html><center><b>Carregar playlist</b><br>");
         carregarPlaylistBtn.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setFileFilter(new FileNameExtensionFilter("Arquivo de playlist", "txt"));
             if(JFileChooser.APPROVE_OPTION == fc.showOpenDialog(janela)) {
                 try {
                     tocador.resetarECarregarPlaylist(fc.getSelectedFile().toPath());
-                    atualizarImagemETexto(false);
+                    atualizarImagemETexto(MediaPlayer.Status.READY);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(carregarPlaylistBtn, "Erro ao carregar playlist: " + ex.getMessage());
                 }
@@ -192,53 +193,49 @@ public class GUI {
 
         JPanel painel = new JPanel();
         painel.setLayout(new GridLayout(2, 2));
-        painel.add(addbtn);
+        painel.add(adicionarMusicaURLBtn);
         painel.add(carregarPlaylistBtn);
-        painel.add(addCaminhoBtn);
+        painel.add(adicionarMusicaLocalBtn);
         painel.add(salvarPlaylistBtn);
         return painel;
     }
     public JPanel criarPainelInferior() {
-        JButton qbtn = new JButton("Mostrar fila");
-        qbtn.addActionListener(e -> JOptionPane.showMessageDialog(null, tocador.getFilaComoString()));
-        qbtn.setBackground(Color.DARK_GRAY);
-        qbtn.setForeground(Color.WHITE);
+        mostraFilaBtn.addActionListener(e -> JOptionPane.showMessageDialog(null, tocador.getFilaComoString()));
+        mostraFilaBtn.setBackground(Color.DARK_GRAY);
+        mostraFilaBtn.setForeground(Color.WHITE);
 
-        JButton upbtn = new JButton("Vol +");
-        upbtn.addActionListener(e -> {
+        volumeMaisBtn.addActionListener(e -> {
             double volumeAtual = tocador.getVolume();
             tocador.setVolume(volumeAtual <= 1000 ? volumeAtual + 10 : volumeAtual);
         });
-        upbtn.setBackground(Color.DARK_GRAY);
-        upbtn.setForeground(Color.RED);
+        volumeMaisBtn.setBackground(Color.DARK_GRAY);
+        volumeMaisBtn.setForeground(Color.RED);
 
-        JButton mutebtn = new JButton("Mutar");
-        mutebtn.addActionListener(e -> {
+        muteBtn.addActionListener(e -> {
             boolean mute = tocador.getMute();
             if(!mute) {
-                mutebtn.setText("Desmutar");
+                muteBtn.setText("Desmutar");
             } else {
-                mutebtn.setText("Mutar");
+                muteBtn.setText("Mutar");
             }
             tocador.setMute(!mute);
         });
-        mutebtn.setBackground(Color.DARK_GRAY);
-        mutebtn.setForeground(Color.WHITE);
+        muteBtn.setBackground(Color.DARK_GRAY);
+        muteBtn.setForeground(Color.WHITE);
 
-        JButton downbtn = new JButton("Vol -");
-        downbtn .addActionListener(e -> {
+        volumeMenosBtn.addActionListener(e -> {
             double volumeAtual = tocador.getVolume();
             tocador.setVolume(volumeAtual >= 0 ? volumeAtual - 10 : volumeAtual);
         });
-        downbtn.setBackground(Color.DARK_GRAY);
-        downbtn.setForeground(Color.BLUE);
+        volumeMenosBtn.setBackground(Color.DARK_GRAY);
+        volumeMenosBtn.setForeground(Color.BLUE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 2));
-        panel.add(qbtn);
-        panel.add(upbtn);
-        panel.add(mutebtn);
-        panel.add(downbtn);
+        panel.add(mostraFilaBtn);
+        panel.add(volumeMaisBtn);
+        panel.add(muteBtn);
+        panel.add(volumeMenosBtn);
         return panel;
     }
     public void setVisible(boolean b) {

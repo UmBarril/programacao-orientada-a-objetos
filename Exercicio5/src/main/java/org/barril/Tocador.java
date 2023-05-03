@@ -66,7 +66,7 @@ public class Tocador {
         atual = new MediaPlayer(proximo);
         return true;
     }
-    public MediaPlayer.Status getStatusAtual() {
+    public MediaPlayer.Status getStatus() {
         if(atual == null) {
             return MediaPlayer.Status.STALLED;
         }
@@ -118,6 +118,7 @@ public class Tocador {
         }
     }
     public void resetarECarregarPlaylist(Path caminho) throws IOException {
+        proximaMusica(); // parar musica atual se estiver tocando
         musicas = new LinkedList<>(); // resetar playlist
         try(Stream<String> lines = Files.lines(caminho)) { // carregar playlist
             lines.forEach(this::adicionarMusica);
