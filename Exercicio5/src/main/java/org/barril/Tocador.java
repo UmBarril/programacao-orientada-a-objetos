@@ -3,13 +3,15 @@ package org.barril;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.stream.Stream;
 
 public class Tocador {
     private double volume = 50;
@@ -56,7 +58,8 @@ public class Tocador {
             atual.dispose();
             atual = null;
         }
-        Media proximo = musicas.poll();
+        musicas.poll(); // tirar a musica que está tocando agora
+        Media proximo = musicas.peek(); // pegar a música seguinte
         if(proximo == null) {
             return false;
         }
@@ -78,7 +81,7 @@ public class Tocador {
         int i = 0;
         sb.append("<html>");
         for(Media m : musicas) {
-            sb.append(i + ": " + m.getSource() + "<br>");
+            sb.append(i).append(": ").append(m.getSource()).append("<br>");
             i++;
         }
         sb.append("</html>");
@@ -93,23 +96,38 @@ public class Tocador {
     public double getVolume() {
         return volume;
     }
-    public void mutaDesmuta() {
-        mute = !mute;
+    public void setMute(boolean mute) {
+        this.mute = mute;
         if(atual != null) {
-            atual.setMute(mute);
+            this.atual.setMute(mute);
         }
+    }
+    public boolean getMute() {
+        return mute;
     }
     public boolean estaMutado() {
         return mute;
     }
-    public String getMusicaAtual() {
-        return musicas.peek().getSource();
-    }
-
-    public static void salvarMusica(String enderecoEletronico, String caminho) throws IOException {
+    public static void salvarMusica(String enderecoEletronico, Path caminho) throws IOException {
         URL url = new URL(enderecoEletronico);
-        ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-        FileOutputStream fo = new FileOutputStream(caminho);
-        fo.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        try (
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+            FileOutputStream fo = new FileOutputStream(caminho.toFile())
+        ) {
+            fo.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        }
+    }
+    public void resetarECarregarPlaylist(Path caminho) throws IOException {
+        musicas = new LinkedList<>(); // resetar playlist
+        try(Stream<String> lines = Files.lines(caminho)) { // carregar playlist
+            lines.forEach(this::adicionarMusica);
+        }
+    }
+    public void salvarPlaylist(Path caminho) throws IOException {
+        try(FileWriter fw = new FileWriter(caminho.toFile())) {
+            for(Media media : musicas) {
+                fw.write(media.getSource());
+            }
+        }
     }
 }

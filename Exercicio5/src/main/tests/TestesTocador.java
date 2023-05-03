@@ -14,10 +14,8 @@ public class TestesTocador {
     @Test
     public void testaDesmuta() {
         Tocador tocador = new Tocador();
-        tocador.mutaDesmuta();
-        tocador.mutaDesmuta();
-        tocador.mutaDesmuta();
-        tocador.mutaDesmuta();
+        tocador.setMute(!tocador.getMute());
+        tocador.setMute(!tocador.getMute());
         assertFalse(tocador.estaMutado());
     }
 
@@ -34,15 +32,14 @@ public class TestesTocador {
          tocador.adicionarMusica("https://cdn.discordapp.com/attachments/650518741250998273/1102802849785729086/scrabdackleOST_-_Junk_Heap.mp3");
          tocador.adicionarMusica("https://www.myinstants.com/media/sounds/among.mp3");
          assertTrue(tocador.proximaMusica());
-         assertEquals("https://cdn.discordapp.com/attachments/650518741250998273/1102802849785729086/scrabdackleOST_-_Junk_Heap.mp3", tocador.getMusicaAtual());
+         tocador.adicionarMusica("https://www.myinstants.com/media/sounds/among.mp3");
          assertTrue(tocador.proximaMusica());
-         assertEquals("https://www.myinstants.com/media/sounds/among.mp3", tocador.getMusicaAtual());
          assertFalse(tocador.proximaMusica());
      }
 
      @Test
-     public void testPausarMusicaSemMusica() throws NenhumaMusicaNaFilaException {
+     public void testPausarMusicaSemMusica() {
         Tocador tocador = new Tocador();
-        tocador.pausarMusica();
+        assertThrows(NenhumaMusicaNaFilaException.class, () -> tocador.pausarMusica());
     }
 }
